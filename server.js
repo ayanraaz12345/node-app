@@ -15,8 +15,8 @@ app.get("/health", (req, res) => {
 
 // Simple API
 app.get("/api/message", (req, res) => {
-   res.json({ message: "Hello from Node.js DevOps App 🎯" });
-   res.send("Deployed by Raj Singh 🚀")
+   res.json({ message: "Hello I am raj🎯  " });
+
 });
 
 app.listen(PORT, () => {
