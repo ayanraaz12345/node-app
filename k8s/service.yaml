@@ -10,3 +10,4 @@ spec:
     - port: 80
       targetPort: 3000
   # how to access your application load balancing and networking and all
+# changes
