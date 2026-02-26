@@ -13,7 +13,7 @@ app.get("/health", (req, res) => {
    res.json({ status: "UP" });
 });
 
-// Simple API
+// Simple API hello
 app.get("/api/message", (req, res) => {
    res.json({ message: "Live ci/cd working 🎯  " });
    res.send("LIVE AUTO DEPLOY 🚀")
