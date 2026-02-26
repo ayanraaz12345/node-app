@@ -3,6 +3,7 @@ name: Build Push Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch: # ✅ Manual trigger added
 
 jobs:
   deploy:
@@ -25,8 +26,8 @@ jobs:
           fi
           echo "✅ Secrets OK"
 
-       - name: Set up Docker Buildx
-         uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx # ✅ fixed indentation
+        uses: docker/setup-buildx-action@v2
 
       # ✅ Docker Login
       - name: Docker Login
@@ -35,7 +36,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # ✅ Debug Secret (NOW CORRECT)
+      # ✅ Debug Secret
       - name: Debug secret
         run: |
           if [ -z "${{ secrets.DOCKER_USER }}" ]; then
