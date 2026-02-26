@@ -20,12 +20,17 @@ jobs:
           password: ${{ secrets.DOCKER_PASS }}
 
       # Build with version tag (NO CACHE ISSUE)
+      # Build Image (SAFE FORMAT)
       - name: Build Image
-        run: docker build -t ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }} .
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }} \
+            .
 
+      # Push Image
       - name: Push Image
-        run: docker push ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }}
-
+        run: |
+          docker push ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }}
       # AWS Auth (Correct way)
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
