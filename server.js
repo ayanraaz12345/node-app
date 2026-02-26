@@ -15,7 +15,8 @@ app.get("/health", (req, res) => {
 
 // Simple API
 app.get("/api/message", (req, res) => {
-   res.json({ message: "Hello I am raj🎯  " });
+   res.json({ message: "Live ci/cd working 🎯  " });
+   res.send("LIVE AUTO DEPLOY 🚀")
 
 });
 
