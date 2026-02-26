@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # ✅ Validate Secrets (prevents hidden errors)
+      # ✅ Validate Secrets
       - name: Validate secrets
         run: |
           if [ -z "${{ secrets.DOCKER_USER }}" ]; then
@@ -25,14 +25,24 @@ jobs:
           fi
           echo "✅ Secrets OK"
 
-      # ✅ Docker Login (official action)
+      # ✅ Docker Login
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # ✅ Build Image (safe format)
+      # ✅ Debug Secret (NOW CORRECT)
+      - name: Debug secret
+        run: |
+          if [ -z "${{ secrets.DOCKER_USER }}" ]; then
+            echo "SECRET EMPTY ❌"
+            exit 1
+          else
+            echo "SECRET LOADED ✅"
+          fi
+
+      # ✅ Build Image
       - name: Build Image
         run: |
           docker build \
@@ -54,14 +64,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # ✅ Setup kubectl (fast install)
+      # ✅ Install kubectl
       - name: Install kubectl
         run: |
           curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.29.0/bin/linux/amd64/kubectl
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      # ✅ Deploy to EKS
+      # ✅ Deploy
       - name: Deploy to EKS 🚀
         run: |
           aws eks update-kubeconfig --region ap-south-1 --name devops-cluster
