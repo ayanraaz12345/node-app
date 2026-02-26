@@ -12,26 +12,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Docker login
+      # ✅ Validate Secrets (prevents hidden errors)
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.DOCKER_USER }}" ]; then
+            echo "❌ DOCKER_USER missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DOCKER_PASS }}" ]; then
+            echo "❌ DOCKER_PASS missing"
+            exit 1
+          fi
+          echo "✅ Secrets OK"
+
+      # ✅ Docker Login (official action)
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # Build with version tag (NO CACHE ISSUE)
-      # Build Image (SAFE FORMAT)
+      # ✅ Build Image (safe format)
       - name: Build Image
         run: |
           docker build \
+            -t ${{ secrets.DOCKER_USER }}/node-devops-app:latest \
             -t ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }} \
             .
 
-      # Push Image
+      # ✅ Push Image
       - name: Push Image
         run: |
+          docker push ${{ secrets.DOCKER_USER }}/node-devops-app:latest
           docker push ${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }}
-      # AWS Auth (Correct way)
+
+      # ✅ AWS Auth
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -39,15 +54,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # Install kubectl
+      # ✅ Setup kubectl (fast install)
       - name: Install kubectl
         run: |
-          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.29.0/bin/linux/amd64/kubectl
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      # Deploy to EKS
+      # ✅ Deploy to EKS
       - name: Deploy to EKS 🚀
         run: |
           aws eks update-kubeconfig --region ap-south-1 --name devops-cluster
-          kubectl set image deployment/node-devops-app node-app=${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }}
+          kubectl set image deployment/node-devops-app \
+            node-app=${{ secrets.DOCKER_USER }}/node-devops-app:${{ github.run_number }}
